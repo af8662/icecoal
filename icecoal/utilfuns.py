@@ -11,7 +11,7 @@ def getdel():
     global DELIMITER
     return DELIMITER
 
-def __select(required_fields,csvfile,headfile,etree):
+def __select(required_fields,csvfile,headfile,etree, encoding='utf-8'):
     '''Function that returns rows that match the condition given
     @param: requiired_fields-list of fields that need to be returned or *
     @param: csvfile-String of table name
@@ -31,7 +31,7 @@ def __select(required_fields,csvfile,headfile,etree):
     #Open table if exist
     if os.path.exists(csvfile):
         if os.path.isfile(csvfile):
-            __csv_file=open(csvfile,'r')
+            __csv_file=open(csvfile,'r',encoding=encoding)
         else:
             return -2
     else:
@@ -43,7 +43,7 @@ def __select(required_fields,csvfile,headfile,etree):
     else:
         if os.path.exists(headfile):
             if os.path.isfile(headfile):
-                hf=open(headfile,"r")
+                hf=open(headfile,"r",encoding=encoding)
                 head=hf.readline().strip('\n').split(DELIMITER)
                 hf.close()
             else:
@@ -87,7 +87,7 @@ def __select(required_fields,csvfile,headfile,etree):
     else:
         return [0,str(count)+' rows selected',result]
 
-def __update(fields,values,csvfile,headfile,etree):
+def __update(fields,values,csvfile,headfile,etree, encoding='utf-8'):
     '''Ipdates the table with given values
     @param: fields, list of fields that need to be changed
     @param: values, list of corresponding values of above given fields
@@ -110,7 +110,7 @@ def __update(fields,values,csvfile,headfile,etree):
         if os.path.exists(csvfile):
             if os.path.isfile(csvfile):
                 os.rename(csvfile,csvfile+".bak")
-                __csv_file=open(csvfile+".bak",'r')
+                __csv_file=open(csvfile+".bak",'r',encoding=encoding)
             else:
                 return -2
         else:
@@ -122,7 +122,7 @@ def __update(fields,values,csvfile,headfile,etree):
         else:
             if os.path.exists(headfile):
                 if os.path.isfile(headfile):
-                    hf=open(headfile,"r")
+                    hf=open(headfile,"r",encoding=encoding)
                     head=hf.readline().strip('\n').split(DELIMITER)
                     hf.close()
                 else:
@@ -131,7 +131,7 @@ def __update(fields,values,csvfile,headfile,etree):
                 return -3
                 
         #Open the resultant file with .bak2 extension. this will then be renamed to original csvfile once all updates performed
-        __res_csv_file=open(csvfile+".bak2","w") #Note this may overwrite unfinished operation performed earlier
+        __res_csv_file=open(csvfile+".bak2","w",encoding=encoding) #Note this may overwrite unfinished operation performed earlier
         #Write the header inside the file
         firstline=True
         if headfile=='':
@@ -199,7 +199,7 @@ def __update(fields,values,csvfile,headfile,etree):
             os.rename(csvfile+".bak2",csvfile)
         #Exceptions in finally clause is unhandled to inform user
 
-def __delete(csvfile,headfile,etree):
+def __delete(csvfile,headfile,etree, encoding='utf-8'):
     '''Deletes the row that matching condition
     @param: csvfile-String of data file name
     @param: headfile-String of header file name or empty
@@ -220,7 +220,7 @@ def __delete(csvfile,headfile,etree):
         if os.path.exists(csvfile):
             if os.path.isfile(csvfile):
                 os.rename(csvfile,csvfile+".bak")
-                __csv_file=open(csvfile+".bak",'r')
+                __csv_file=open(csvfile+".bak",'r',encoding=encoding)
             else:
                 return -2
         else:
@@ -232,7 +232,7 @@ def __delete(csvfile,headfile,etree):
         else:
             if os.path.exists(headfile):
                 if os.path.isfile(headfile):
-                    hf=open(headfile,"r")
+                    hf=open(headfile,"r",encoding=encoding)
                     head=hf.readline().strip('\n').split(DELIMITER)
                     hf.close()
                 else:
@@ -241,7 +241,7 @@ def __delete(csvfile,headfile,etree):
                 return -3
                 
         #Open the resultant file with .bak2 extension. this will then be renamed to original csvfile once all updates performed
-        __res_csv_file=open(csvfile+".bak2","w") #Note this may overwrite unfinished operation performed earlier
+        __res_csv_file=open(csvfile+".bak2","w",encoding=encoding) #Note this may overwrite unfinished operation performed earlier
         #Write the header inside the file
         firstline=True
         if headfile=='':
@@ -314,7 +314,7 @@ def __mkdb(dbname):
     else:
         pass
 
-def __mktable(tablename,header): #Optionally with path
+def __mktable(tablename,header, encoding='utf-8'): #Optionally with path
     '''Creates a table with given path and header content
     If table name given with no path, it will be created in current directory
     @param: tablename - String name of table to be created
@@ -332,7 +332,7 @@ def __mktable(tablename,header): #Optionally with path
         if (os.path.dirname(tablename)!='') and not os.path.exists(os.path.dirname(tablename)):
             return -2
         if not os.path.exists(tablename):
-            newfile=open(tablename,'w')
+            newfile=open(tablename,'w',encoding=encoding)
             newfile.write((DELIMITER.join(header.split(","))))
             newfile.close()
             return 0
@@ -343,7 +343,7 @@ def __mktable(tablename,header): #Optionally with path
     else:
         pass
 
-def __insertrow(tablename,row):
+def __insertrow(tablename,row, encoding='utf-8'):
     '''Inserts given row in given table as a last row
     This inserts a new lineseparator specific to current os at every line end
     @param: tablename, string with dbname/tablename.csv format
@@ -358,7 +358,7 @@ def __insertrow(tablename,row):
     try:
         if os.path.exists(tablename):
             if os.path.isfile(tablename):
-                givenfile=open(tablename,'a+')
+                givenfile=open(tablename,'a+',encoding=encoding)
                 
                 #Check if provided field count matches with table's field count
                 givenfile.seek(0)
@@ -417,7 +417,7 @@ def __droptable(tablename):
     else:
         return -1
         
-def __truntable(tablename):
+def __truntable(tablename, encoding='utf-8'):
     '''Truncates the table
     @param: table - String, name of the table to be truncated with the database name
     @return: -1 if the table does not exist
@@ -428,11 +428,11 @@ def __truntable(tablename):
     try:
         if os.path.exists(tablename):
             if os.path.isfile(tablename):
-                f = open(tablename,'r')
+                f = open(tablename,'r',encoding=encoding)
                 header=f.readline().strip('\n')
                 f.close()
                 
-                f= open(tablename,'w')
+                f= open(tablename,'w',encoding=encoding)
                 f.write(header)
                 f.close()
                 return 0

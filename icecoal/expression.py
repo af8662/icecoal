@@ -118,8 +118,6 @@ def par(exp):
 
     return exp
 
-
-
 def calculate(a,op,b,a_type,b_type):
     ops=['%','/','*','+','-','<','<=','>','>=','!=','=','&','|']
     if op not in ops:
@@ -195,6 +193,14 @@ def calculate(a,op,b,a_type,b_type):
         if op=='|':
             return a or b
    
+def exp_rule_legal(rule, state, qi):
+	if (rule[0]==state):
+		if (( rule[1] in ['any','other']) or (qi in rule[1])):
+			return True		
+		if 'unicode' in rule[1] and ord(qi)>127:
+			return True
+	
+	return False
 
 def create_exp_tree(exp):
     
@@ -211,7 +217,7 @@ def create_exp_tree(exp):
     while char_index<len(exp): #For every character in the expression
 
         for rule in exp_rules: #Search through all the rules
-            if ((state==rule[0]) and ((rule[1] in ['any','other']) or (exp[char_index] in rule[1]))): #if the m
+            if exp_rule_legal(rule, state, exp[char_index]):
                 found=True
                 state=rule[2]
                 if rule[3]=='operatorpush':

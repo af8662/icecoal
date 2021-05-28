@@ -10,6 +10,16 @@ from .expression import create_exp_tree
 from .const import *
 def escape(a):
     return a.replace('\\','\\\\').replace("'","\\'").replace('"','\\"').replace("#","\\#")
+
+def rule_legal(rule, state, qi):
+	if (rule[0]==state):
+		if (( rule[1]=='any') or (qi in rule[1])):
+			return True
+		if 'unicode' in rule[1] and ord(qi)>127:
+			return True
+	
+	return False
+
 def execute_query(q):
     q+="#"
     state='0'
@@ -34,7 +44,7 @@ def execute_query(q):
         if not end:
             for j in range(0,len(rule)):
                 #if state is equal to current state and it allows current char
-                if (rule[j][0]==state) and ((rule[j][1]=='any') or(q[i] in rule[j][1])):
+                if rule_legal(rule[j], state, q[i]):
                     #Execute required and stop rule search
                     found=True
                     state=rule[j][2]
