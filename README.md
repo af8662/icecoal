@@ -1,3 +1,10 @@
+# Our Contributions
+Support Unicode Characters
+
+Support select from mutiple tables with mutiple conditions (only support AND)
+
+Please run ```python demo.py``` in root directory to check it.
+
 ![](art/logo.png)
 # Icecoal
 Icecoal is a light weight SQL database
