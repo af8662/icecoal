@@ -20,9 +20,9 @@ def rule_legal(rule, state, qi):
 	
 	return False
 
-def execute_query(q):
+def execute_query(q, return_etree=False):
     q+="#"
-    state='0'
+    state='0' if not return_etree else '24'
     temp=""
     templist=[]
     
@@ -153,6 +153,8 @@ def execute_query(q):
             pass
         else:
             i+=1
+    if return_etree:
+        return etree
     # Execute the corresponding function inferred from the query
     if keyword=='select':
         rt=__select(required_fields,csvfile,headfile,etree)

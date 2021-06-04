@@ -1,1 +1,3 @@
-icecoal/
+icecoal/__pycache__/*
+
+*/.vs/*

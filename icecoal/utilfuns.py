@@ -11,7 +11,7 @@ def getdel():
     global DELIMITER
     return DELIMITER
 
-def __select(required_fields,csvfile,headfile,etree, encoding='utf-8'):
+def __select(required_fields,csvfile,headfile,etree, encoding='utf-8', from_csvfile=True):
     '''Function that returns rows that match the condition given
     @param: requiired_fields-list of fields that need to be returned or *
     @param: csvfile-String of table name
@@ -24,33 +24,46 @@ def __select(required_fields,csvfile,headfile,etree, encoding='utf-8'):
     @return: -4 if header file is not name of a file
     @return: -5 field mentioned in select not found in table
     '''
+    def _next_line(lines):
+        if type(lines) is list:
+            if len(lines)>0:
+                line = lines.pop(0)
+            else:
+                line = ''
+        else:
+            line=__csv_file.readline()
+        return line
     global DELIMITER
     #Initiate result set to empty
     result=[]
     count=0
-    #Open table if exist
-    if os.path.exists(csvfile):
-        if os.path.isfile(csvfile):
-            __csv_file=open(csvfile,'r',encoding=encoding)
-        else:
-            return -2
-    else:
-        return -1
-
-    #open headfile if exist
-    if headfile=='': # If no header file provided, first line of csvfile is the header line
-        head=__csv_file.readline().strip('\n').split(DELIMITER)
-    else:
-        if os.path.exists(headfile):
-            if os.path.isfile(headfile):
-                hf=open(headfile,"r",encoding=encoding)
-                head=hf.readline().strip('\n').split(DELIMITER)
-                hf.close()
+    if from_csvfile:
+        #Open table if exist
+        if os.path.exists(csvfile):
+            if os.path.isfile(csvfile):
+                __csv_file=open(csvfile,'r',encoding=encoding)
             else:
-                return -4
+                return -2
         else:
-            return -3
-    line=__csv_file.readline()
+            return -1
+
+        #open headfile if exist
+        if headfile=='': # If no header file provided, first line of csvfile is the header line
+            head=__csv_file.readline().strip('\n').split(DELIMITER)
+        else:
+            if os.path.exists(headfile):
+                if os.path.isfile(headfile):
+                    hf=open(headfile,"r",encoding=encoding)
+                    head=hf.readline().strip('\n').split(DELIMITER)
+                    hf.close()
+                else:
+                    return -4
+            else:
+                return -3
+    else:
+        __csv_file = csvfile
+        head = headfile
+    line = _next_line(__csv_file)
     while(len(line)!=0): #Until end of file
         if len(line.strip('\n'))!=0: #If the line is empty line
             row=line.strip('\n').split(DELIMITER)
@@ -79,8 +92,9 @@ def __select(required_fields,csvfile,headfile,etree, encoding='utf-8'):
                 raise sqlerror(-13,"Where clause condition returns non-boolean result")
         else:
             pass #Empty line, ignore it silently
-        line=__csv_file.readline()
-    __csv_file.close()
+        line=_next_line(__csv_file)
+    if from_csvfile:
+        __csv_file.close()
     count=len(result)
     if count==0:
         return [1,'0 rows selected',result]
